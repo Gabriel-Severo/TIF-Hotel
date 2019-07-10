@@ -9,6 +9,7 @@
     void cadastrar();
     void conectar();
     void fzreserva();
+    int verificarCampo();
 
     int main ()
 
@@ -31,9 +32,12 @@
     {
         char voltar;
 
-        printf("\nVocê quer voltar para o menu(S/N): ");
-
-        scanf(" %c", &voltar);
+        do{
+            printf("\nVocê quer voltar para o menu(S/N): ");
+            scanf(" %c", &voltar);
+            printf("%c", voltar);
+        }
+        while (voltar != 's' && voltar != 'S' && voltar != 'n' && voltar != 'N');
 
         if(voltar == 's' || voltar == 'S')
         {
@@ -136,8 +140,27 @@ void cadastrar(char cadastro[][100], MYSQL *conexao)
     printf("CPF: ");
     scanf("%s", &cadastro[2]);
 
+    //verificar se CPF já está em uso
+    int valido = verificarCampo(conexao, "cpf", cadastro[2]);
+
+    while(valido != 0){
+        printf("CPF: ");
+        scanf("%s", &cadastro[2]);
+        valido = verificarCampo(conexao, "cpf", cadastro[2]);
+    }
+
     printf("RG: ");
     scanf("%s", &cadastro[3]);
+
+    //verificar se RG já está em uso
+    valido = verificarCampo(conexao, "rg", cadastro[3]);
+
+    while(valido != 0){
+        printf("RG: ");
+        scanf("%s", &cadastro[3]);
+        valido = verificarCampo(conexao, "rg", cadastro[3]);
+    }
+
 
     fflush(stdin);
     printf("Cidade: ");
@@ -172,7 +195,7 @@ void consultar (MYSQL *conexao)
 {
     system("cls");
     printf("CONSULTAR CLIENTES:\n");
-    char nome[100], quarto[3];
+    char nome[100];
 
     fflush(stdin);
 
@@ -200,11 +223,9 @@ void consultar (MYSQL *conexao)
             printf("%s: %s\n", campos[i], linhas[i]);
             i++;
         }
-
     }
 
     voltar(conexao);
-
 }
 
 void fzreserva ()
@@ -234,9 +255,27 @@ void fzreserva ()
     scanf ("%i", &id);
 
     //Verificar disponibilidade do quarto no Banco de dados.
-
-
-
 }
 
+int verificarCampo(MYSQL *conexao, char field[100], char value[100]){
+    char query[100];
+    sprintf(query, "SELECT * FROM cadastro WHERE %s='%s'", field, value);
+
+    mysql_query(conexao, query);
+
+    MYSQL_RES *resultado = mysql_store_result(conexao);
+
+    int linhas = mysql_num_rows(resultado);
+
+    if(linhas == 0){
+        printf("\n%s válido\n\n", field);
+    }else{
+        printf("\n%s já está em uso!\n\n", field);
+    }
+
+    // limpa todas as queries antes de voltar para a função cadastro
+    mysql_free_result(resultado);
+
+    return linhas;
+}
 
