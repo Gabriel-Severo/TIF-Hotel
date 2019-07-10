@@ -4,110 +4,239 @@
 #include <locale.h>
 #include <string.h>
 
-void menu ();
-void cadastrar();
-void conectar();
+    void consultar();
+    void menu ();
+    void cadastrar();
+    void conectar();
+    void fzreserva();
 
-int main ()
-{
-    setlocale(LC_ALL, "Portuguese");
+    int main ()
 
-    int opc;
-    char nome[60], rg[10], cpf[12], nascimento; // nascimento √© no formato 2019-12-23. no mysql.  Variaveis para o Inser Into no banco. mude para a estrututura do banco de dados de voces.
-    char cadastro[8][100] = {};
+    {
+        setlocale(LC_ALL, "Portuguese");
 
-    MYSQL conexao;
-    mysql_init(&conexao);
-    conectar(&conexao);
+        int i;
+        char nome[60], rg[10], cpf[12], nascimento;
 
-    menu(); // Estrutura de op√ß√µes.
-    printf("\t>>> ");
+        MYSQL conexao;
 
-    do{
-        scanf("%d", &opc);
-        if(opc < 0 || opc > 2)
-            printf("Op√ß√£o inv√°lida\n\t>>>");
-    }while (opc < 0 || opc > 2);
+        mysql_init(&conexao);
+        conectar(&conexao);
 
-    if (opc == 1)
-        cadastrar(cadastro, &conexao);
-    else if (opc == 2)
-        printf("");
-    else if (opc == 0){
-        printf("Cya!");
-        exit(0);
+        menu(&conexao);
+
     }
-}
 
-void voltar(){
-    char voltar;
-    printf("\nVoc√™ quer voltar para o menu(S/N): ");
-    scanf(" %c", &voltar);
+    void voltar(MYSQL *conexao)
+    {
+        char voltar;
 
-    if(voltar == 's' || voltar == 'S'){
-        system("cls");
-        menu();
-    }else{
-        printf("Saindo...");
+        printf("\nVocÍ quer voltar para o menu(S/N): ");
+
+        scanf(" %c", &voltar);
+
+        if(voltar == 's' || voltar == 'S')
+        {
+            system("cls"); //Limpando a tela de comando!
+            menu(conexao);
+        }
+        else
+        {
+            printf("Saindo...");
+        }
     }
-}
 
-void menu ()
-{
-    // estrutura do menu.
-    printf("              Tif Palace HOTEL\n\n||             Menu Principal             ||\n||----------------------------------------||\n||                                        ||\n||      1 - Cadastrar Cliente.            ||\n||      2 - Buscar Cliente.               ||\n||      0 - Para sair                     ||\n||                                        ||\n||                                        ||\n||                                        ||\n");
-}
+    void menu (MYSQL *conexao)
+
+    {
+        int opc;
+        char cadastro[7][100] = {};
+
+        // estrutura do menu.
+
+        printf("              Tif Palace HOTEL\n\n||             Menu Principal             ||\n||----------------------------------------||\n||                                        ||\n||      1 - Cadastrar Cliente.            ||\n||      2 - Buscar Cliente.               ||\n||      3 - fazer Reserva.                ||\n||      0 - Para Sair.                    ||\n||                                        ||\n||                                        ||\n");
+
+        printf("\t>>> ");
+
+        do{
+            scanf("%d", &opc);
+
+            if(opc < 0 || opc > 3)
+            {
+                printf("OpÁ„o invalida\n\t>>>");
+            }
+
+        } while (opc < 0 || opc > 3);
+
+        if (opc == 1)
+
+        {
+            cadastrar(cadastro, conexao);
+        }
+        else
+        if (opc == 2)
+
+        {
+            consultar(conexao);
+        }
+        else
+        if (opc == 0)
+
+        {
+            printf("Cya!");
+            exit(0);
+        }
+        else
+        if (opc == 3)
+        {
+            fzreserva();
+        }
+    }
 
 void conectar(MYSQL *conexao)
 {
 	printf("Conectando... \n");
+
     //realiza a conex√£o com o banco de dado  e faz o teste.
+
     if (mysql_real_connect(conexao, "db4free.net", "tifhotell", "tifhotel", "tifhotell", 0, NULL, 0))
-        printf("Banco de dados conectado com sucesso!\n");
-    else
+    {
+		printf("Banco de dados conectado com sucesso!\n");
+	}
+	else
+	{
         printf("Algo deu errado %s %d\n", mysql_error(conexao), mysql_errno(conexao));
+    }
 }
 
 void cadastrar(char cadastro[][100], MYSQL *conexao)
 {
-    //Limpa o lixo da mem√≥ria, assim o gets funciona normalmente
-    fflush(stdin);
+    //Limpa o lixo da memoria, assim o gets funciona normalmente
+
 	char ano[5], mes[3], dia[3];
     system("cls");
-    printf("CADASTRAR USU√ÅRIO\n");
+
+    printf("CADASTRAR USUARIO:\n");
+
+    fflush(stdin);
     printf("Nome: ");
     gets(cadastro[0]);
+
     printf("Data de nascimento(DD MM AAAA): ");
     scanf("%s %s %s", &dia, &mes, &ano);
+
     //Junta a data com o - pois o SQL s√≥ aceita esse formato
     strcat(ano, "-");
     strcat(ano, mes);
     strcat(ano, "-");
     strcat(ano, dia);
     strcpy(cadastro[1], ano);
+
+
     printf("CPF: ");
     scanf("%s", &cadastro[2]);
+
     printf("RG: ");
     scanf("%s", &cadastro[3]);
+
     fflush(stdin);
     printf("Cidade: ");
+
     gets(cadastro[4]);
     fflush(stdin);
+
     printf("Estado: ");
     gets(cadastro[5]);
+
     fflush(stdin);
-    printf("Pa√≠s: ");
+
+    printf("PaÌs: ");
     gets(cadastro[6]);
+
     printf("Telefone: ");
     scanf("%s", &cadastro[7]);
-    printf("Quarto: ");
-    scanf("%s", &cadastro[8]);
+
     printf("\nCADASTRO SALVO COM SUCESSO!");
+
     char query[200];
-    sprintf(query,"INSERT INTO cadastro (nome, cpf, rg, nascimento, quarto, telefone, cidade, estado, pais) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');"
-            , cadastro[0], cadastro[2], cadastro[3], cadastro[1], cadastro[8], cadastro[7], cadastro[4], cadastro[5], cadastro[6]);
-    mysql_query(conexao, query);
-    voltar();
+
+    sprintf(query,"INSERT INTO cadastro (nome, cpf, rg, nascimento, telefone, cidade, estado, pais) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');"
+            , cadastro[0], cadastro[2], cadastro[3], cadastro[1], cadastro[7], cadastro[4], cadastro[5], cadastro[6]);
+
+	mysql_query(conexao, query);
+
+	voltar(conexao);
+}
+
+void consultar (MYSQL *conexao)
+{
+    system("cls");
+    printf("CONSULTAR CLIENTES:\n");
+    char nome[100], quarto[3];
+
+    fflush(stdin);
+
+    printf("Nome: ");
+    gets(nome);
+
+    char query[100];
+    sprintf(query, "SELECT * FROM cadastro WHERE nome='%s'", nome);
+    if(mysql_query(conexao, query))
+        printf("Erro\n");
+    else
+        printf("Query com sucesso\n");
+    MYSQL_RES *resp = mysql_store_result(conexao);
+    MYSQL_ROW linhas = mysql_fetch_row(resp);
+    //Se o numero retornado for 0 quer dizer que n„o encontrou ninguÈm no banco de dados
+    int numero_linhas = mysql_num_rows(resp);
+
+    if (numero_linhas == 0){
+        printf("N„o encontrei %s", nome);
+    }else{
+        char campos[9][100]={{"Id"}, {"Nome"}, {"CPF"}, {"RG"}, {"Nascimento"}, {"Telefone"}, {"Cidade"}, {"Estado"}, {"Pais"}};
+        int i = 0;
+        printf("\n");
+        while (i<mysql_num_fields(resp)){
+            printf("%s: %s\n", campos[i], linhas[i]);
+            i++;
+        }
+
+    }
+
+    voltar(conexao);
+
+}
+
+void fzreserva ()
+
+{
+    char resp;
+    int id;
+
+    printf ("O usuario ja È cadastrado (S ou N): ");
+    scanf ("%s", &resp);
+
+    if (resp == 'S' || resp == 's')
+    {
+
+        printf ("\nDigite o cpf do cliente:");
+        // Fazer consulta com o servidor.
+    }
+    else
+    if (resp == 'N' || resp == 'n')
+
+    {
+        void cadastrar();
+    }
+
+
+    printf ("Digite o numero do Quarto:");
+    scanf ("%i", &id);
+
+    //Verificar disponibilidade do quarto no Banco de dados.
+
+
+
 }
 
 
