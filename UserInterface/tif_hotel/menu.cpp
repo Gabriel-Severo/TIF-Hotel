@@ -7,11 +7,13 @@ Menu::Menu(QWidget *parent, Pessoa* p) :
     ui(new Ui::Menu)
 {
     ui->setupUi(this);
-    ui->btn_reserva->setStyleSheet(PushButtonStyle);
-    ui->btn_consulta->setStyleSheet(PushButtonStyle);
+    ui->btn_reserva->setStyleSheet(Styles::optionButtonStyle);
+    ui->btn_consulta->setStyleSheet(Styles::optionButtonStyle);
+    ui->pushButton->setStyleSheet(Styles::PushButtonStyle);
 
     ui->txt_nome->setText(p->getNome());
     ui->txt_email->setText(p->getEmail());
+    ui->txt_cpf->setText(p->getCPF());
 }
 
 Menu::~Menu()

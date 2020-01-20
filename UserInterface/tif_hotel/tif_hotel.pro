@@ -19,12 +19,14 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     menu.cpp \
+    pessoa.cpp \
     register.cpp \
     styles.cpp
 
 HEADERS += \
     mainwindow.h \
     menu.h \
+    pessoa.h \
     register.h \
     styles.h
 

@@ -3,22 +3,12 @@
 
 #include <QString>
 
-extern QString PushButtonStyle;
-extern QString ScreenStyle;
-
-class Pessoa
+class Styles
 {
 public:
-    QString nome;
-    QString email;
-
-    void setNome(QString nome);
-    QString getNome();
-    void setEmail(QString email);
-    QString getEmail();
+    static QString optionButtonStyle;
+    static QString PushButtonStyle;
+    static QString ScreenStyle;
 };
-
-
-
 
 #endif // STYLES_H

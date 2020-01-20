@@ -8,7 +8,7 @@ Register::Register(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->btn_cadastrar->setStyleSheet(PushButtonStyle);
+    ui->btn_cadastrar->setStyleSheet(Styles::PushButtonStyle);
 }
 
 Register::~Register()

@@ -2,7 +2,7 @@
 #define MENU_H
 
 #include <QDialog>
-#include "styles.h"
+#include "pessoa.h"
 
 namespace Ui {
 class Menu;
